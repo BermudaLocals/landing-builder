@@ -1,0 +1,46 @@
+{
+  "name": "landing-builder",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma": "prisma",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "@clerk/nextjs": "^4.29.5",
+    "@clerk/clerk-js": "^4.29.5",
+    "@prisma/client": "^5.7.0",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.309.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "tailwind-merge": "^2.2.0",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "prisma": "^5.7.0",
+    "tailwindcss": "^3.3.0",
+    "autoprefixer": "^10.0.0",
+    "postcss": "^8.0.0",
+    "typescript": "^5",
+    "eslint": "^8",
+    "eslint-config-next": "^14.0.0"
+  }
+}
