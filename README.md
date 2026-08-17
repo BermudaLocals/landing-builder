@@ -43,8 +43,9 @@ npm install
 
 2. Set up environment:
 ```bash
-cp .env.example .env.local
+cp .env.example .env
 # Add your Clerk keys and database URL
+# (.env is read by both Next.js and the Prisma CLI)
 ```
 
 3. Set up database:
@@ -102,8 +103,12 @@ vercel --prod
 
 ## 🔧 API Routes
 
-- `POST /api/publish` - Publish landing page
-- Returns: `{ url: "https://slug.launchpad-demo.com" }`
+- `GET/POST /api/projects` - List/create projects (authenticated, ownership-scoped)
+- `GET/PUT/DELETE /api/projects/[id]` - Read/update/delete own projects
+- `POST /api/projects/[id]/publish` - Publish a snapshot, returns `{ url: "/p/<slug>" }`
+- `POST /api/publish` - Generate standalone HTML/CSS export for posted components
+- `GET /api/health` - Public health probe for the production gate
+- `GET /p/[slug]` - Public published pages (no authentication)
 
 ## 📄 License
 

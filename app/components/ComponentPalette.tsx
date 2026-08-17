@@ -1,9 +1,9 @@
 'use client';
 
 import { useDrag } from 'react-dnd';
-import { 
-  Header, 
-  Star, 
+import {
+  PanelTop,
+  Star,
   Users, 
   MessageSquare, 
   CreditCard, 
@@ -19,7 +19,7 @@ interface ComponentItem {
 
 export default function ComponentPalette({ onAddComponent }: { onAddComponent: (type: any) => void }) {
   const components: ComponentItem[] = [
-    { type: 'header', label: 'Header', icon: <Header className="w-5 h-5" /> },
+    { type: 'header', label: 'Header', icon: <PanelTop className="w-5 h-5" /> },
     { type: 'hero', label: 'Hero', icon: <Star className="w-5 h-5" /> },
     { type: 'features', label: 'Features', icon: <Layout className="w-5 h-5" /> },
     { type: 'testimonials', label: 'Testimonials', icon: <MessageSquare className="w-5 h-5" /> },
@@ -39,7 +39,7 @@ export default function ComponentPalette({ onAddComponent }: { onAddComponent: (
 
     return (
       <div
-        ref={drag}
+        ref={drag as unknown as React.Ref<HTMLDivElement>}
         onClick={() => onAddComponent(component.type)}
         className={`p-4 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-all ${isDragging ? 'opacity-50' : ''}`}
       >

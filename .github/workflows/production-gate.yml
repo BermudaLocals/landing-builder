@@ -1,0 +1,41 @@
+name: production-gate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  static-gate:
+    name: Static gate (install, typecheck, lint, prisma, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Static gate
+        run: npm run gate:static
+        env:
+          # Placeholder only — Prisma CLI validates the schema shape, no
+          # connection is ever opened. Real credentials stay in deployment env.
+          DATABASE_URL: postgresql://user:password@localhost:5432/launchpad
+
+  deploy-gate:
+    name: Deploy gate (read-only HTTP checks against BASE_URL)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Deploy gate
+        run: npm run gate:deploy
+        env:
+          # Set BASE_URL in the repo's Actions variables (Configuration
+          # variables, not secrets) to your Railway URL, then run this
+          # workflow manually after a deployment.
+          BASE_URL: ${{ vars.BASE_URL }}

@@ -73,7 +73,7 @@ export default function ComponentRenderer({ component, onUpdate }: ComponentRend
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {(component.props.testimonials || []).map((testimonial: any, index: number) => (
                 <div key={index} className="p-6 bg-white/50 rounded-lg border border-gray-200">
-                  <p className="italic mb-4">"{testimonial.quote || 'Great service!'}"</p>
+                  <p className="italic mb-4">&quot;{testimonial.quote || 'Great service!'}&quot;</p>
                   <div>
                     <div className="font-semibold">{testimonial.author || 'John Doe'}</div>
                     <div className="text-gray-600 text-sm">{testimonial.role || 'Customer'}</div>

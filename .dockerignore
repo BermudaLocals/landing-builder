@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.gitignore
+.dockerignore
+Dockerfile
+railway.json
+*.log
+.env
+.env.local
+.env*.local
+docs
+README.md
+.github
+tests
+scripts
+vitest.config.mts

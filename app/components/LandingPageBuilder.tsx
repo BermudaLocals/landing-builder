@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import Link from 'next/link';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import ComponentPalette from './ComponentPalette';
@@ -8,44 +9,60 @@ import Canvas from './Canvas';
 import PropertyPanel from './PropertyPanel';
 import TemplateGallery from './TemplateGallery';
 import ExportDialog from './ExportDialog';
-import { PanelLeft, PanelRight, Rocket } from 'lucide-react';
+import GenerateDialog from './GenerateDialog';
+import { PanelLeft, PanelRight, Rocket, Sparkles } from 'lucide-react';
 
-type ComponentType = 'header' | 'hero' | 'features' | 'testimonials' | 'pricing' | 'cta' | 'footer';
+export type ComponentType = 'header' | 'hero' | 'features' | 'testimonials' | 'pricing' | 'cta' | 'footer';
 
-interface Component {
+export interface Component {
   id: string;
   type: ComponentType;
   props: Record<string, any>;
   styles: Record<string, any>;
 }
 
-export default function LandingPageBuilder() {
-  const [components, setComponents] = useState<Component[]>([
-    {
-      id: 'header-1',
-      type: 'header',
-      props: { title: 'LaunchPad', logo: '', navItems: ['Home', 'Features', 'Pricing', 'Contact'] },
-      styles: { backgroundColor: '#ffffff', color: '#1f2937' }
-    },
-    {
-      id: 'hero-1',
-      type: 'hero',
-      props: { 
-        title: 'Build Landing Pages That Convert', 
-        subtitle: 'Drag, drop, and deploy in minutes. No code required.',
-        ctaText: 'Start Building',
-        ctaLink: '#',
-        image: ''
-      },
-      styles: { backgroundColor: '#4f46e5', color: '#ffffff' }
-    }
-  ]);
+interface LandingPageBuilderProps {
+  projectId: string;
+  projectTitle?: string;
+  initialComponents?: Component[];
+}
+
+export default function LandingPageBuilder({
+  projectId,
+  projectTitle,
+  initialComponents,
+}: LandingPageBuilderProps) {
+  const [components, setComponents] = useState<Component[]>(
+    initialComponents && initialComponents.length > 0
+      ? initialComponents
+      : [
+          {
+            id: 'header-1',
+            type: 'header',
+            props: { title: 'LaunchPad', logo: '', navItems: ['Home', 'Features', 'Pricing', 'Contact'] },
+            styles: { backgroundColor: '#ffffff', color: '#1f2937' }
+          },
+          {
+            id: 'hero-1',
+            type: 'hero',
+            props: {
+              title: 'Build Landing Pages That Convert',
+              subtitle: 'Drag, drop, and deploy in minutes. No code required.',
+              ctaText: 'Start Building',
+              ctaLink: '#',
+              image: ''
+            },
+            styles: { backgroundColor: '#4f46e5', color: '#ffffff' }
+          }
+        ]
+  );
   
   const [selectedComponent, setSelectedComponent] = useState<string | null>('hero-1');
   const [showLeftPanel, setShowLeftPanel] = useState(true);
   const [showRightPanel, setShowRightPanel] = useState(true);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showExport, setShowExport] = useState(false);
+  const [showGenerate, setShowGenerate] = useState(false);
 
   const addComponent = useCallback((type: ComponentType) => {
     const newComponent: Component = {
@@ -71,18 +88,34 @@ export default function LandingPageBuilder() {
     setSelectedComponent(null);
   }, []);
 
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  const saveProject = useCallback(async () => {
+    setSaveState('saving');
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ components })
+      });
+      setSaveState(response.ok ? 'saved' : 'error');
+    } catch {
+      setSaveState('error');
+    }
+  }, [components, projectId]);
+
   const publishPage = useCallback(async () => {
-    // Publish to Vercel/Netlify
-    const response = await fetch('/api/publish', {
-      method: 'POST',
-      body: JSON.stringify({ components })
+    // Persist first so the snapshot matches the canvas, then publish.
+    await saveProject();
+    const response = await fetch(`/api/projects/${projectId}/publish`, {
+      method: 'POST'
     });
     const data = await response.json();
-    
+
     if (data.url) {
       window.open(data.url, '_blank');
     }
-  }, [components]);
+  }, [projectId, saveProject]);
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -96,15 +129,35 @@ export default function LandingPageBuilder() {
             >
               <PanelLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-xl font-semibold text-gray-800">LaunchPad Builder</h1>
+            <h1 className="text-xl font-semibold text-gray-800">{projectTitle ?? 'LaunchPad Builder'}</h1>
           </div>
-          
+
           <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Dashboard
+            </Link>
+            <button
+              onClick={saveProject}
+              disabled={saveState === 'saving'}
+              className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
+            >
+              {saveState === 'saving' ? 'Saving...' : saveState === 'saved' ? 'Saved ✓' : saveState === 'error' ? 'Save failed' : 'Save'}
+            </button>
             <button
               onClick={() => setShowTemplates(true)}
               className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               Templates
+            </button>
+            <button
+              onClick={() => setShowGenerate(true)}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:opacity-90 flex items-center gap-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              Generate with AI
             </button>
             <button
               onClick={() => setShowExport(true)}
@@ -169,11 +222,24 @@ export default function LandingPageBuilder() {
           onClose={() => setShowExport(false)}
         />
       )}
+
+      {showGenerate && (
+        <GenerateDialog
+          projectId={projectId}
+          onGenerated={(generated) => {
+            setComponents(generated);
+            setSelectedComponent(null);
+            setSaveState('saved'); // the route persists validated components
+            setShowGenerate(false);
+          }}
+          onClose={() => setShowGenerate(false)}
+        />
+      )}
     </DndProvider>
   );
 }
 
-function getDefaultProps(type: ComponentType) {
+export function getDefaultProps(type: ComponentType) {
   const defaults = {
     header: { title: 'Your Brand', logo: '', navItems: ['Home', 'About', 'Contact'] },
     hero: { 
@@ -221,7 +287,7 @@ function getDefaultProps(type: ComponentType) {
   return defaults[type] || {};
 }
 
-function getDefaultStyles(type: ComponentType) {
+export function getDefaultStyles(type: ComponentType) {
   return {
     backgroundColor: type === 'hero' ? '#4f46e5' : '#ffffff',
     color: type === 'hero' ? '#ffffff' : '#1f2937',

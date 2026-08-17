@@ -169,10 +169,6 @@ export default function PropertyPanel({ component, onUpdateComponent }: Property
                 className="w-12 h-10 rounded border border-gray-300"
               />
               <input
-                type="text""/value"}
-                className="w-12 h-10 rounded border border-gray-300"
-              />
-              <input
                 type="text"
                 value={component.styles.color || '#1f2937'}
                 onChange={(e) => updateStyle('color', e.target.value)}

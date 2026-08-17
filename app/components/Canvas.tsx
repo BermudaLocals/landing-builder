@@ -33,7 +33,7 @@ export default function Canvas({
 
   return (
     <div 
-      ref={drop}
+      ref={drop as unknown as React.Ref<HTMLDivElement>}
       className={`min-h-full p-4 transition-all ${isOver ? 'bg-blue-50 border-2 border-dashed border-blue-300' : 'bg-white border border-gray-200'}`}
     >
       <div className="max-w-6xl mx-auto">
