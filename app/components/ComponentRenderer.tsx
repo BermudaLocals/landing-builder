@@ -1,107 +1,34 @@
 'use client';
-
 import { Component } from './LandingPageBuilder';
-import { Edit2 } from 'lucide-react';
 
-interface ComponentRendererProps {
-  component: Component;
-  onUpdate: (updates: Partial<Component>) => void;
-}
+export default function ComponentRenderer({ component, onUpdate }: { component: Component, onUpdate: (u:any)=>void }) {
+  const s = component.styles || { backgroundColor: '#ffffff', color: '#1f2937', padding: '2rem', borderRadius: '0.5rem' };
+  const baseStyles = {
+    backgroundColor: s.backgroundColor || '#ffffff',
+    color: s.color || '#1f2937',
+    padding: s.padding || '2rem',
+    borderRadius: s.borderRadius || '0.5rem',
+  } as any;
 
-export default function ComponentRenderer({ component, onUpdate }: ComponentRendererProps) {
   const renderComponent = () => {
-    const baseStyles = {
-      backgroundColor: component.styles.backgroundColor || '#ffffff',
-      color: component.styles.color || '#1f2937',
-      padding: component.styles.padding || '2rem',
-      borderRadius: component.styles.borderRadius || '0.5rem',
-      border: '1px solid #e5e7eb'
-    };
-
-    switch (component.type) {
-      case 'header':
-        return (
-          <header style={baseStyles}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-blue-500 rounded"></div>
-                <h1 className="text-xl font-bold">{component.props.title || 'Your Brand'}</h1>
-              </div>
-              <nav className="flex gap-6">
-                {(component.props.navItems || ['Home', 'About', 'Contact']).map((item: string) => (
-                  <a key={item} href="#" className="hover:text-blue-600">{item}</a>
-                ))}
-              </nav>
-            </div>
-          </header>
-        );
-      
+    switch(component.type) {
       case 'hero':
         return (
-          <section style={baseStyles} className="text-center">
-            <h1 className="text-4xl font-bold mb-4">{component.props.title || 'Amazing Headline'}</h1>
-            <p className="text-xl mb-8 opacity-90">{component.props.subtitle || 'Compelling subheading'}</p>
-            <button 
-              className="px-8 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition"
-              onClick={() => onUpdate({ props: { ...component.props, ctaText: 'Updated!' } })}
-            >
-              {component.props.ctaText || 'Get Started'}
-            </button>
-          </section>
-        );
-      
-      case 'features':
-        return (
-          <section style={baseStyles}>
-            <h2 className="text-2xl font-bold mb-8 text-center">{component.props.title || 'Why Choose Us'}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {(component.props.features || []).map((feature: any, index: number) => (
-                <div key={index} className="p-4 bg-white/50 rounded-lg">
-                  <div className="text-2xl mb-2">{feature.icon || '✓'}</div>
-                  <h3 className="font-semibold mb-2">{feature.title || 'Feature'}</h3>
-                  <p className="text-gray-600">{feature.description || 'Description'}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-      
-      case 'testimonials':
-        return (
-          <section style={baseStyles}>
-            <h2 className="text-2xl font-bold mb-8 text-center">{component.props.title || 'Testimonials'}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {(component.props.testimonials || []).map((testimonial: any, index: number) => (
-                <div key={index} className="p-6 bg-white/50 rounded-lg border border-gray-200">
-                  <p className="italic mb-4">"{testimonial.quote || 'Great service!'}"</p>
-                  <div>
-                    <div className="font-semibold">{testimonial.author || 'John Doe'}</div>
-                    <div className="text-gray-600 text-sm">{testimonial.role || 'Customer'}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        );
-      
-      default:
-        return (
-          <div style={baseStyles} className="p-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-lg font-semibold">{component.type.toUpperCase()}</div>
-                <div className="text-gray-600">Edit this component in the properties panel</div>
-              </div>
-              <Edit2 className="w-5 h-5 text-gray-400" />
-            </div>
+          <div style={baseStyles} className="text-center py-20">
+            <h1 className="text-5xl font-bold tracking-tight">{component.props.title || 'Build landing pages 10x faster'}</h1>
+            <p className="mt-4 text-lg opacity-70">{component.props.subtitle || 'LaunchPad is better than landingsite.ai'}</p>
+            <button className="mt-8 px-6 py-3 rounded-full bg-zinc-900 text-white">{component.props.cta || 'Get Started'}</button>
           </div>
         );
+      case 'header':
+        return <div style={baseStyles} className="flex justify-between items-center py-4 px-6"><span className="font-bold">LaunchPad</span><span className="text-sm opacity-60">Menu</span></div>;
+      case 'footer':
+        return <div style={baseStyles} className="py-10 text-center text-sm opacity-60">© 2026 LaunchPad - {component.props.title || 'Footer'}</div>;
+      case 'cta':
+        return <div style={baseStyles} className="py-16 text-center bg-zinc-900 text-white rounded-xl"><h3 className="text-3xl font-bold">{component.props.title || 'Ready to launch?'}</h3></div>;
+      default:
+        return <div style={baseStyles} className="py-12 text-center"><div className="text-xs uppercase opacity-40">{component.type}</div><div className="font-medium mt-1">{component.props.title}</div><div className="text-sm opacity-60">{component.props.subtitle}</div></div>;
     }
   };
-
-  return (
-    <div className="relative">
-      {renderComponent()}
-    </div>
-  );
+  return renderComponent();
 }
